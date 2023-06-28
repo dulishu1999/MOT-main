@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author : CatfishW🚀
 # @Time : 2023/5/1
-
+import sys, time
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -15,7 +15,9 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QSlider, QSpacerItem, QSpinBox, QSplitter,
     QVBoxLayout, QWidget)
 import ui.cmp_res #图片资源
-#整个的主页面都是在class Ui_MainWindow这个类中设置
+from PySide6 import QtCore, QtWidgets
+
+
 class Ui_MainWindow(object):
     #   setupUi  QFrame是基本控件的基类，QWidget是QFrame基类
     #QWidget：就是一个容器
@@ -33,10 +35,11 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        
         #QFrame继承QWidget 
         self.Main_QF = QFrame(self.Main_QW)#Main_QF 是左边菜单的背景框
         self.Main_QF.setObjectName(u"Main_QF")
-        self.Main_QF.setStyleSheet(u"QFrame#Main_QF{\n""	background-color: qlineargradient(x0:0, y0:1, x1:1, y1:1,stop:0.4  rgb(0,121,158), stop:1 rgb(123 104 238));\n""border:0px solid red;\n""border-radius:30px\n""}")
+        self.Main_QF.setStyleSheet(u"QFrame#Main_QF{\n""	background-color: qlineargradient(x0:0, y0:1, x1:1, y1:1,stop:0.4  rgb(156,3,2), stop:1 rgb(123 104 238));\n""border:0px solid red;\n""border-radius:30px\n""}")
         self.main_qframe = QHBoxLayout(self.Main_QF)
         self.main_qframe.setSpacing(0)
         self.main_qframe.setObjectName(u"main_qframe")
@@ -49,7 +52,7 @@ class Ui_MainWindow(object):
         self.LeftMenuBg.setStyleSheet(u"QFrame#LeftMenuBg{\n""	background-color: rgba(255, 255, 255,0);\n""border:0px solid red;\n""border-radius:30px\n""}")
         self.LeftMenuBg.setFrameShape(QFrame.NoFrame)
         self.LeftMenuBg.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_2 = QVBoxLayout(self.LeftMenuBg)
+        self.verticalLayout_2 = QVBoxLayout(self.LeftMenuBg)#左边菜单弄了一个垂直布局verticalLayout_2
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, -1)
@@ -60,8 +63,8 @@ class Ui_MainWindow(object):
         self.TopLogoInfo.setMinimumSize(QSize(0, 70))
         self.TopLogoInfo.setMaximumSize(QSize(16777215, 70))
         self.TopLogoInfo.setFrameShape(QFrame.StyledPanel)
-        self.TopLogoInfo.setFrameShadow(QFrame.Raised)
-        self.logo = QWidget(self.TopLogoInfo)
+        self.TopLogoInfo.setFrameShadow(QFrame.Raised)#顶部log先弄个frame
+        self.logo = QWidget(self.TopLogoInfo)#再在frame上弄个widget
         self.logo.setObjectName(u"logo")
         self.logo.setGeometry(QRect(10, 10, 50, 50))
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -90,18 +93,19 @@ class Ui_MainWindow(object):
 "color: rgba(255, 255, 255, 255);")
         self.Title.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_2.addWidget(self.TopLogoInfo)
-        #切换菜单框
-        self.ToggleBox = QFrame(self.LeftMenuBg)
+        self.verticalLayout_2.addWidget(self.TopLogoInfo)#将顶部TopLogoInfo以垂直布局的方式加在LeftMenuBg
+        #展示菜单键的frame
+        self.ToggleBox = QFrame(self.LeftMenuBg)#弄个frame
         self.ToggleBox.setObjectName(u"ToggleBox")
         self.ToggleBox.setMinimumSize(QSize(200, 80))
         self.ToggleBox.setMaximumSize(QSize(200, 80))
         self.ToggleBox.setFrameShape(QFrame.NoFrame)
-        self.ToggleBox.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_4 = QVBoxLayout(self.ToggleBox)
+        self.ToggleBox.setFrameShadow(QFrame.Raised)#配置frame的参数
+        self.verticalLayout_4 = QVBoxLayout(self.ToggleBox)#配置frame的layout
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)#配置
+        #展示菜单键的button
         self.ToggleBotton = QPushButton(self.ToggleBox)
         self.ToggleBotton.setObjectName(u"ToggleBotton")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -145,7 +149,6 @@ class Ui_MainWindow(object):
             icon = QIcon.fromTheme(iconThemeName)
         else:
             icon.addFile(u".", QSize(), QIcon.Normal, QIcon.Off)
-
         self.ToggleBotton.setIcon(icon)
         self.ToggleBotton.setAutoDefault(False)
         self.ToggleBotton.setFlat(False)
@@ -167,7 +170,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         #添加一键训练的控件
         self.train_button = QPushButton(self.MenuBox)
-        self.train_button.setObjectName(u"src_file_button")
+        self.train_button.setObjectName(u"train_button")
         self.train_button.setMinimumSize(QSize(0, 45))
         self.train_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.train_button.setStyleSheet(u"QPushButton{\n"
@@ -1662,16 +1665,15 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.Main_QF)
 
         MainWindow.setCentralWidget(self.Main_QW)
-        #
+        #部件文本标题赋值
         self.retranslateUi(MainWindow)
-
+        #部件默认未触发
         self.ToggleBotton.setDefault(False)
         self.ToggleBotton_6.setDefault(False)
         self.ToggleBotton_2.setDefault(False)
         self.ToggleBotton_3.setDefault(False)
         self.ToggleBotton_4.setDefault(False)
         self.ToggleBotton_5.setDefault(False)
-
 
         QMetaObject.connectSlotsByName(MainWindow)
     
@@ -1694,7 +1696,7 @@ class Ui_MainWindow(object):
         self.min_sf.setText("")
         self.max_sf.setText("")
         self.close_button.setText("")
-        self.char_label.setText(QCoreApplication.translate("MainWindow", u"VisonWave-ML平台(工业级)", None))
+        self.char_label.setText(QCoreApplication.translate("MainWindow", u"VisionWave-ML平台(工业级)", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"总类别数", None))
         self.Class_num.setText("")
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"总目标数", None))

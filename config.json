@@ -1,0 +1,6 @@
+{
+    "theme": {
+        "location": "ui\\css\\themes\\dark_blue.xml",
+        "is_light": false
+    }
+}

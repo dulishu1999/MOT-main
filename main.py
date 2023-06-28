@@ -2,12 +2,16 @@
 # @Author : CatfishW🚀
 # @Time : 2023/5/1
 '''想要个小star star😊'''
+from PySide6 import QtCore
+from PySide6 import QtCore, QtWidgets
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMenu
 from PySide6.QtGui import QImage, QPixmap, QColor,QCursor
 from PySide6.QtCore import QTimer, QThread, Signal, QObject, Qt
+from qt_material import apply_stylesheet
 from ui.CustomMessageBox import MessageBox
 from ui.mainwindow import Ui_MainWindow
 from ui.UIFunctions import *
+from ui.main_ui_files.MainWindow import TrainMainWindow
 from collections import defaultdict
 from pathlib import Path
 from utils.capnums import Camera
@@ -447,6 +451,8 @@ class YoloPredictor(BasePredictor, QObject):
             #print(e)
             #self.yolo2main_status_msg.emit('%s' % e)
 
+
+    
 class MainWindow(QMainWindow, Ui_MainWindow):
     main2yolo_begin_sgl = Signal()  #主窗口向yolo实例发送执行信号
     #实例构造方法 并且指定父类为None
@@ -491,6 +497,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.yolo_predict.moveToThread(self.yolo_thread)#初始化了一个线程 然后把检测任务加到了这个线程里              
         
         #模型参数  在跑模型之前会
+
         self.model_box.currentTextChanged.connect(self.change_model)     
         self.iou_spinbox.valueChanged.connect(lambda x:self.change_val(x, 'iou_spinbox'))    # iou box
         self.iou_slider.valueChanged.connect(lambda x:self.change_val(x, 'iou_slider'))      # iou scroll bar
@@ -505,7 +512,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Model_name.setText(self.select_model)
         
         # connect 可以将事件和按钮联系在一起 pyqt 中按键执行逻辑是用 connect 来响应动作执行函数
-        self.train_button.clicked.connect(self.Onekey_train)
+        self.train_button.clicked.connect(self.trainSetting)
         self.src_file_button.clicked.connect(self.open_src_file)
         self.sys_setting_button.clicked.connect(self.open_model_file)
         self.src_cam_button.clicked.connect(self.camera_select)
@@ -520,7 +527,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.save_res_button.toggled.connect(self.is_save_res)  
         self.save_txt_button.toggled.connect(self.is_save_txt)  
         self.show_labels_checkbox.toggled.connect(self.is_show_labels)  
-        self.ToggleBotton.clicked.connect(lambda: UIFuncitons.toggleMenu(self, True))   
+        #ToggleBotton   触发的函数是toggleMenu，只是改变主页框大小，让功能键的文本露出来
+        self.ToggleBotton.clicked.connect(lambda: UIFuncitons.toggleMenu(self, True))
         self.settings_button.clicked.connect(lambda: UIFuncitons.settingBox(self, True))   
         
         self.load_config()
@@ -595,7 +603,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
                 self.run_button.setChecked(False)    
 
-
     def show_status(self, msg):
         self.status_bar.setText(msg)
         if msg == 'Detection completed' or msg == '检测完成':
@@ -618,12 +625,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.Target_num.setText('--')
             self.fps_label.setText('--')
 
-    def Onekey_train(self):
-        print("start to train.....")
-        #添加数据集路径
-        #添加类别
-        ##############
-        #执行训练
+    def trainSetting(self):
+        print("start to train Setting.....")
+        #第一步导入系统配置文件
+        if os.path.exists("config.json"):
+            with open("config.json", 'r') as f:
+                config = json.load(f)
+        else:
+            config = {"theme": {
+                "location": os.path.join("ui","css", "themes", "dark_teal.xml"),
+                "is_light": False
+            }}
+        fp = open("config.json", 'w')
+        json.dump(config, fp=fp, indent=4)
+        fp.close()
+
+        self.trainsetting_window = TrainMainWindow()
+
+        apply_stylesheet(self.trainsetting_window, theme=config['theme']['location'], invert_secondary=config['theme']['is_light'])#UI界面风格设置
+        self.trainsetting_window.show()
+
+
+        
     def open_src_file(self):
         config_file = 'config/fold.json'    
         config = json.load(open(config_file, 'r', encoding='utf-8'))
@@ -918,7 +941,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     if not os.path.exists('weights'):
         os.mkdir('weights')
-    app = QApplication(sys.argv)# 初始化并实例Qwidgt部件
+    app = QtWidgets.QApplication(sys.argv)# 初始化并实例Qwidgt部件
     Home = MainWindow()
     Home.show()
     # app.exec() 执行主线程任务
