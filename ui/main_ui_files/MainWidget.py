@@ -55,10 +55,11 @@ class MainWidget(QtWidgets.QWidget):
         args, dataset_args = self.args_widget.collate_args()#参数整理后返回基础参数和数据集参数，点击
         dataset_args['subsets'] = self.subset_widget.get_subset_args()#获取子数据集参数
         self.training_thread = threading.Thread(target=self.train_thread)
+
         args = validator.validate_args(args)
         dataset_args = validator.validate_dataset_args(dataset_args)
         if not args or not dataset_args:
-            print("failed validation")
+            print("failed validation...")#参数验证没有通过
             return False
         validator.validate_restarts(args, dataset_args)
         validator.validate_warmup_ratio(args, dataset_args)
@@ -75,15 +76,19 @@ class MainWidget(QtWidgets.QWidget):
     def train_thread(self):
         self.begin_training_button.setEnabled(False)#将开始训练的button置为false
         python = sys.executable#该属性是一个字符串，在正常情况下，其值是当前运行的 Python 解释器对应的可执行程序所在的绝对路径。
+        print(len(self.queue_widget.elements))
         if len(self.queue_widget.elements) == 0:
-            if not self.validate_args():#如果参数验证没有通过
-                self.begin_training_button.setEnabled(True)
-                return
+            # if not self.validate_args():#如果参数验证没有通过
+            #     self.begin_training_button.setEnabled(True)
+            #     return
             try:
-                subprocess.check_call([python, os.path.join("ui","sd_scripts", "train_network.py"),
-                                       f"--config_file={os.path.join('ui','runtime_store', 'config.toml')}",
-                                       f"--dataset_config={os.path.join('ui','runtime_store', 'dataset.toml')}"])
-            except subprocess.SubprocessError as e:
+                # subprocess.check_call([python, os.path.join("ui","sd_scripts", "train_network.py"),
+                #                        f"--config_file={os.path.join('ui','runtime_store', 'config.toml')}",
+                #                        f"--dataset_config={os.path.join('ui','runtime_store', 'dataset.toml')}"])
+                os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"#必须要添加这个系统环境变量，否则会训练报错
+                os.system("yolo detect train data=coco128.yaml model=yolov8n.pt epochs=100 imgsz=640")
+            # except subprocess.SubprocessError as e:
+            except os.error as e:
                 print(f"Failed to train because of error:\n{e}")
             files = [os.path.join("ui","runtime_store", "config.toml"), os.path.join("ui","runtime_store", "dataset.toml")]
             for file in files:
@@ -111,14 +116,14 @@ class MainWidget(QtWidgets.QWidget):
                                                                     f"auto_save_{args.get('output_name', 'last')}.toml"))
                 self.create_config_args_file(args)#创造一个参数配置文件
                 self.create_dataset_args_file(dataset_args)#创建一个数据集参数配置文件
-                print("validated, starting training...")#参数验证通过开始训练
-                subprocess.check_call([python, os.path.join("ui","sd_scripts", "train_network.py"),
+                print("validated, starting training...")#参数验证通过开始训练 ultralytics\yolo\engine\trainer.py
+                subprocess.check_call([python, os.path.join("ultralytics","ultralytics","yolo", "engine","trainer.py"),
                                        f"--config_file={os.path.join('ui','runtime_store', 'config.toml')}",
                                        f"--dataset_config={os.path.join('ui','runtime_store', 'dataset.toml')}"])#这相当于就是执行一个带参的训练指令
             except BaseException as e:
                 if not isinstance(e, subprocess.SubprocessError):
                     print(f"Failed to train because of error:\n{e}")
-        for file in os.listdir("runtime_store"):
+        for file in os.listdir("ui\\runtime_store"):
             if file != '.gitignore':
                 os.remove(os.path.join("ui","runtime_store", file))
         self.begin_training_button.setEnabled(True)

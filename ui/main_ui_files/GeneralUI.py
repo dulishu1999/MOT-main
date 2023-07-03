@@ -2,7 +2,7 @@ import os.path
 from typing import Union
 
 from PySide6 import QtWidgets, QtCore, QtGui
-
+import ui
 from ui.modules.DragDropLineEdit import DragDropLineEdit
 from ui.ui_files.BaseUI import Ui_base_args_ui
 from ui.modules.CollapsibleWidget import CollapsibleWidget
@@ -78,7 +78,7 @@ class BaseArgsWidget(QtWidgets.QWidget):
     @QtCore.Slot(str, object, bool, QtWidgets.QWidget)
     def edit_args(self, name: str, value: object, optional: bool = False, elem: QtWidgets.QWidget = None) -> None:
         if elem:
-            if isinstance(elem, modules.DragDropLineEdit.DragDropLineEdit):
+            if isinstance(elem, ui.modules.DragDropLineEdit.DragDropLineEdit):
                 elem.update_stylesheet()
         if not optional:
             self.args[name] = value

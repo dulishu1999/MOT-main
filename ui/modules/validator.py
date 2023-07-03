@@ -18,7 +18,7 @@ def separate_and_validate(args: dict) -> tuple[Union[dict, None], Union[dict, No
     valid_dataset = validate_dataset_args(new_dataset_args)
     return valid, valid_dataset
 
-
+#args 参数列表是
 def validate_args(args: dict) -> Union[dict, None]:
     print("starting validation of args...")
     file_inputs = ["pretrained_model_name_or_path", "output_dir"]
