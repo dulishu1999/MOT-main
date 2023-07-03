@@ -3,7 +3,7 @@ from typing import Union
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
-import ui.modules.DragDropLineEdit
+from ui.modules.DragDropLineEdit import DragDropLineEdit
 from ui.ui_files.BaseUI import Ui_base_args_ui
 from ui.modules.CollapsibleWidget import CollapsibleWidget
 

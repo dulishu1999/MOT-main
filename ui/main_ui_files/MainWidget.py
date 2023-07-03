@@ -46,14 +46,14 @@ class MainWidget(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def begin_train(self) -> None:
-        if self.training_thread and self.training_thread.is_alive():
+        if self.training_thread and self.training_thread.is_alive():#如果训练的线程是启动的，点击开始训练的button是无效的
             return
-        self.training_thread = threading.Thread(target=self.train_thread)
-        self.training_thread.start()
+        self.training_thread = threading.Thread(target=self.train_thread)#启动一个线程，这个线程执行的目标函数是train_thread
+        self.training_thread.start()#启动线程
 
     def validate_args(self) -> bool:
-        args, dataset_args = self.args_widget.collate_args()
-        dataset_args['subsets'] = self.subset_widget.get_subset_args()
+        args, dataset_args = self.args_widget.collate_args()#参数整理后返回基础参数和数据集参数，点击
+        dataset_args['subsets'] = self.subset_widget.get_subset_args()#获取子数据集参数
         self.training_thread = threading.Thread(target=self.train_thread)
         args = validator.validate_args(args)
         dataset_args = validator.validate_dataset_args(dataset_args)
@@ -76,7 +76,7 @@ class MainWidget(QtWidgets.QWidget):
         self.begin_training_button.setEnabled(False)#将开始训练的button置为false
         python = sys.executable#该属性是一个字符串，在正常情况下，其值是当前运行的 Python 解释器对应的可执行程序所在的绝对路径。
         if len(self.queue_widget.elements) == 0:
-            if not self.validate_args():
+            if not self.validate_args():#如果参数验证没有通过
                 self.begin_training_button.setEnabled(True)
                 return
             try:
@@ -93,7 +93,7 @@ class MainWidget(QtWidgets.QWidget):
                     pass
             self.begin_training_button.setEnabled(True)
             return
-        while len(self.queue_widget.elements) > 0:
+        while len(self.queue_widget.elements) > 0:#看样子是根据队列中的项目数，多少个项目执行多少次训练指令
             try:
                 file = os.path.join("ui","runtime_store", f"{self.queue_widget.elements[0].queue_file}.toml")#读取批量的toml文件
                 self.queue_widget.remove_first_from_queue()
@@ -207,39 +207,39 @@ class ArgsWidget(QtWidgets.QWidget):
         self.general_args = GeneralUI.BaseArgsWidget()
         self.general_args.colap.toggle_collapsed()
         self.general_args.colap.title_frame.setChecked(True)
-        self.args_widget_array.append(self.general_args)
+        self.args_widget_array.append(self.general_args)#args_widget_array是参数部件列表，并将general_args部件实例对象加入这个列表中
 
         # add the rest of the args widgets
         self.network_args = NetworkUI.NetworkWidget()
-        self.args_widget_array.append(self.network_args)
+        self.args_widget_array.append(self.network_args)#添加
         self.optimizer_args = OptimizerUI.OptimizerWidget()
-        self.args_widget_array.append(self.optimizer_args)
+        self.args_widget_array.append(self.optimizer_args)#添加
         self.saving_args = SavingUI.SavingWidget()
-        self.args_widget_array.append(self.saving_args)
+        self.args_widget_array.append(self.saving_args)#添加
         self.bucket_args = BucketUI.BucketWidget()
-        self.args_widget_array.append(self.bucket_args)
+        self.args_widget_array.append(self.bucket_args)#添加
         self.noise_args = NoiseOffsetUI.NoiseOffsetWidget()
-        self.args_widget_array.append(self.noise_args)
+        self.args_widget_array.append(self.noise_args)#添加
         self.sample_args = SampleUI.SampleWidget()
-        self.args_widget_array.append(self.sample_args)
+        self.args_widget_array.append(self.sample_args)#添加
         self.logging_args = LoggingUI.LoggingWidget()
-        self.args_widget_array.append(self.logging_args)
+        self.args_widget_array.append(self.logging_args)#添加
 
-        # set all args widgets into layout
+        # set all args widgets into layout 将所有的部件添加到布局中
         for widget in self.args_widget_array:
             self.scroll_widget.layout().addWidget(widget)
-
+    #参数的整理  参数有两个，一个是args，一个是dataset_args
     def collate_args(self) -> tuple[dict, dict]:
         args = {}
         dataset_args = {}
         for widget in self.args_widget_array:
-            widget.get_args(args)
+            widget.get_args(args)#按引用传递
             widget.get_dataset_args(dataset_args)
         return args, dataset_args
-
+    #参数的保存
     def save_args(self) -> dict:
         args = {}
-        for widget in self.args_widget_array:
+        for widget in self.args_widget_array:#遍历参数项列表
             widget_args = widget.save_args()
             widget_dataset_args = widget.save_dataset_args()
             args[widget.name] = {}
@@ -248,7 +248,7 @@ class ArgsWidget(QtWidgets.QWidget):
             if widget_dataset_args:
                 args[widget.name]['dataset_args'] = widget_dataset_args.copy()
         return args
-
+    #参数的导入
     def load_args(self, args: dict) -> None:
         for widget in self.args_widget_array:
             if hasattr(widget, "load_args"):
